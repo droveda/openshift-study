@@ -146,7 +146,7 @@ DeploymentConfigs is a collection of pods, this is new on openshif and not prese
 * oc get secret
 * oc get -o yaml secret/message-secret
 * oc set env dc/hello-world --from secret/message-secret
-* oc create secret -f pods/secret-example.yaml
+* oc create -f pods/secret-example.yaml
 * oc create -f pods/pod-with-secret.yaml
 
 ## Images and Image Streams
@@ -213,3 +213,49 @@ DeploymentConfigs is a collection of pods, this is new on openshif and not prese
 4. oc logs -f bc/hello-world
 5. oc set build-hook bc/hello-world --post-commit --script="exit 1"
 6. oc set build-hook bc/hello-world --post-commit --remove
+
+## Source to Image (S2I)
+It transforms your application source code into a container image.
+* Flow of the build process:
+  * Start -> Is there a docker file? Yes -> Use the Docker Stragegy, No -> Try Source Strategy
+
+
+## Volumes
+Filesystem mounted in Pods, Many Suppliers
+- Config Maps, Secrets
+- Attached Hard Disks
+- Cloud Storage (S3, Google Compute Files)
+
+### Volumes Labs (Empty Dir Volume)
+* oc new-app quay.io/practicalopenshift/hello-world
+* oc set volume deployment/hello-world \
+  --add \
+  --type emptyDir \
+  --mount-path /empty-dir-demo
+* oc get -o yaml deployment/hello-world
+* oc get pods
+  * oc rsh hello-world-7df78f575c-msdv9
+
+### Volumes Mount a ConfigMap as a Volume
+* oc create configmap cm-volume \
+  --from-literal file.txt="ConfigMap file contents"
+* oc set volume deployment/hello-world \
+  --add \
+  --configmap-name cm-volume \
+  --mount-path /cm-directory
+* oc get -o yaml deployment/hello-world
+* oc get pods
+  * oc rsh hello-world-7df78f575c-msdv9
+
+### Volumes Mount a Secret as a Volume
+* oc create -f labs/pods/secret-example.yaml
+* oc set volume deployment/hello-world \
+  --add \
+  --secret-name lab-secret \
+  --mount-path /secret-volume
+* oc get -o yaml deployment/hello-world
+* oc get pods
+  * oc rsh hello-world-7df78f575c-msdv9
+
+### Volumes, How to use other types of Volume Providers
+* https://kubernetes.io/docs/concepts/storage/volumes/

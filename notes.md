@@ -259,3 +259,44 @@ Filesystem mounted in Pods, Many Suppliers
 
 ### Volumes, How to use other types of Volume Providers
 * https://kubernetes.io/docs/concepts/storage/volumes/
+
+
+
+## Advanced Deployment Config
+* ImageChange Trigger
+* Webhook with Trigger
+* ConfigChange Trigger
+
+### Config Trigger LAB (example)
+* oc new-app quay.io/practicalopenshift/hello-world --as-deployment-config
+* oc get pods --watch
+* oc set volume deployment/hello-world \
+  --add \
+  --type emptyDir \
+  --mount-path /empty-dir-demo
+* This will trigger a deploy caused by a Config Change
+
+### Removing Triggers
+* oc set triggers dc/hello-world
+* oc set triggers dc/hello-world \
+  --remove \
+  --from-config
+* oc set triggers dc/hello-world \
+  --remove \
+  --from-image hello-world:latest
+
+### Deployment Hooks
+
+## Liveness and Readiness Probes
+* Readiness Probe -> Is this Pod ready to accept traffic?
+* Liveness Probe -> Should we restart this Pod?
+* Probe Options
+  * HTTP GET (for rest APIs)
+  * TCP (socket check, if you are able to execute a TCP connection)
+  * Command
+* Number of retries
+* Time between tries
+* Example: (this will set a liveness probe)
+  * oc set probe dc/hello-world \
+    --liveness \
+    --open-tcp=8080

@@ -300,3 +300,54 @@ Filesystem mounted in Pods, Many Suppliers
   * oc set probe dc/hello-world \
     --liveness \
     --open-tcp=8080
+
+
+## Manual Scaling
+* oc scale dc/hello-world --replicas=1
+* oc describe dc/hello-world
+
+## Horizontal Pod Autoscalers HPA
+* Number of Pods
+* Current Resource Usage
+* Desired Resource Usage
+
+### Calculating Current Usage
+* Some scenarios:
+  * 1000 milicores means that you are ocupying a single processor 100%
+  * 500 milicores means that you are ocupying a single processor 50%
+  * 2000 milicores means that you are ocupying two processors 100%
+* Current Usage:
+  * Add together current usage for each Pod
+* Calculating Desired Usage:
+  * Numer of Pods * Target CPU * Requested CPU per Pod
+* HPA Equation:
+  Usage Ratio = Total Current Usage / Total Desired Usage
+  New Pods = Current Pods * Usage Ratio
+
+### Creating Auto Scale
+* oc autoscale dc/hello-world \
+  --min 1 \
+  --max 10 \
+  --cpu-percent=80
+* oc get hpa
+* oc describe hpa/hello-world
+* oc get -o yaml hpa/hello-world
+
+
+## Templates
+* oc create -f template/hello-world-template.yaml
+* oc get template
+* oc new-app hello-world (create a new app from the template)
+* oc status
+
+### Template Parameters
+* oc get -o yaml template/hello-world
+* oc delete all --all
+* oc new-app hello-world \
+  -p MESSAGE="Hello from parameter override."
+
+### Processing Templates
+* oc process hello-world
+* oc process hello-world -o yaml
+* oc process hello-world -o yaml -p MESSAGE="Hello from oc process"
+* oc process hello-world -o yaml -p MESSAGE="Hello from oc process" > processed-objects.yaml
